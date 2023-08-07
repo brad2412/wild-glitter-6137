@@ -1,7 +1,7 @@
 <h1>Plots</h1>
 
 <% @plots.each do |plot| %>
-  <div id="plot<%= plot.number %>">
+  <div id="plot_<%= plot.id %>">
     <h2>Plot Number: <%= plot.number %></h2>
     <ul>
       <% plot.plant_plots.each do |plant_plot| %>
