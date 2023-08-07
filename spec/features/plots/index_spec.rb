@@ -14,24 +14,58 @@ RSpec.describe "plots index" do
   @plant_plot1 = PlantPlot.create!(plot: @p1, plant: @plant1)
   @plant_plot2 = PlantPlot.create!(plot: @p1, plant: @plant2)
   @plant_plot3 = PlantPlot.create!(plot: @p2, plant: @plant3)
+  @plant_plot4 = PlantPlot.create!(plot: @p2, plant: @plant1)
 
+  visit plots_path
   end
   it "should have list of all plot numbers with name of all plots names" do
-    visit "/plots"
     # save_and_open_page
     expect(page).to have_content(@p1.number)
     expect(page).to have_content(@p2.number)
   
-    expect(page).to have_content(@plant1.name, count: 1)
-    expect(page).to have_content(@plant2.name, count: 1)
-    expect(page).to have_content(@plant3.name, count: 1)
+    expect(page).to have_content(@plant1.name)
+    expect(page).to have_content(@plant2.name)
+    expect(page).to have_content(@plant3.name)
 
+  end
+
+  it "should remove a plant from a plot when clicking the 'Remove' link" do
+    within("#plot1") do
+      expect(page).to have_link("Remove #{@plant1.name} from plot #{@p1.number}")
+      expect(page).to have_link("Remove #{@plant2.name} from plot #{@p1.number}")
+      click_link("Remove #{@plant1.name} from plot #{@p1.number}")
+      expect(current_path).to eq(plots_path)
+      expect(page).to_not have_content(@plant1.name)
+      save_and_open_page
+    end
+
+
+    within("#plot2") do
+      expect(page).to have_link(@plant1.name)
+    end
+  end
+
+  it "should still show other associated plants on the plot after removal" do
+    within("#plot1") do
+      expect(page).to have_link(@plant2.name)
+    end
+
+    within("#plot2") do
+      expect(page).to have_link(@plant1.name)
+      expect(page).to have_link(@plant3.name)
+    end
   end
 end
 
-# User Story 1, Plots Index Page
+# User Story 2, Remove a Plant from a Plot
 
 # As a visitor
-# When I visit the plots index page ('/plots')
-# I see a list of all plot numbers
-# And under each plot number I see the names of all that plot's plants
+# When I visit the plots index page
+# Next to each plant's name
+# I see a link to remove that plant from that plot
+# When I click on that link
+# I'm returned to the plots index page
+# And I no longer see that plant listed under that plot,
+# And I still see that plant's name under other plots that is was associated with.
+
+# Note: you do not need to test for any sad paths or implement any flash messages. 
